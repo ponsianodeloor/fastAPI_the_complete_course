@@ -1,5 +1,5 @@
 """
-Create a variable (grade) holding an ineger between 0 - 100
+Create a variable (grade) holding an integer between 0 - 100
 A = 90 - 100
 B = 80 - 89
 C = 70 - 79
