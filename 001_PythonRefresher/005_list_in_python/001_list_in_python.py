@@ -40,4 +40,5 @@ print(people_list)
 people_list.pop(0)
 print("Se elimina un elemento a la lista ingresando el indice")
 print(people_list)
+print(len(people_list))
 
