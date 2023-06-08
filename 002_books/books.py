@@ -24,3 +24,12 @@ async def read_book(book_title: str):
             return book
         else:
             return {'book': 'El libro no se encuentra en la lista'}
+
+
+@app.get('/books_in_category')
+async def read_books_by_category(category: str):
+    books_in_category = []
+    for book in BOOKS:
+        if book.get('category').casefold() == category.casefold():
+            books_in_category.append(book)
+    return books_in_category
