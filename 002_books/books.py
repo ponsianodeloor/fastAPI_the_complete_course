@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import Body, FastAPI
 
 app = FastAPI()
 
@@ -47,3 +47,9 @@ async def read_book_by_author_and_category(author: str, category: str):
         return books_by_author_and_category
     else:
         return {'message': 'No existen libros'}
+
+
+@app.post('/books/create_book')
+async def create_book(new_book=Body()):
+    BOOKS.append(new_book)
+    return {'message': 'Libro creado correctamente'}
