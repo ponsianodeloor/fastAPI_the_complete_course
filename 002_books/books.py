@@ -8,7 +8,7 @@ BOOKS = [
     {'title': 'Title three', 'author': 'Author three', 'category': 'History'},
     {'title': 'Title four', 'author': 'Author four', 'category': 'History'},
     {'title': 'Title five', 'author': 'Author five', 'category': 'Math'},
-    {'title': 'Title six', 'author': 'Author six', 'category': 'Math'},
+    {'title': 'Title six', 'author': 'Author two', 'category': 'Math'},
 ]
 
 
@@ -33,6 +33,23 @@ async def read_books_by_category(category: str):
         if book.get('category').casefold() == category.casefold():
             books_by_category.append(book)
     return books_by_category
+
+@app.get('/books/author/{author}')
+async def read_books_by_category(author: str):
+    books_by_author = []
+    for book in BOOKS:
+        if book.get('author').casefold() == author.casefold():
+            books_by_author.append(book)
+    return books_by_author
+
+
+@app.get('/books_by_author')
+async def read_books_by_category(author: str):
+    books_by_author = []
+    for book in BOOKS:
+        if book.get('author').casefold() == author.casefold():
+            books_by_author.append(book)
+    return books_by_author
 
 
 @app.get('/books_by_author_and_category/{author}')
@@ -61,3 +78,12 @@ async def update_book(updated_book=Body()):
         if BOOKS[i].get('title').casefold() == updated_book.get('title').casefold():
             BOOKS[i] = updated_book
             return {'message': 'Libro actualizado correctamente'}
+
+
+@app.delete("/books/delete_book/{book_title}")
+async def delete_book(book_title=str):
+    for i in range(len(BOOKS)):
+        if BOOKS[i].get('title').casefold() == book_title.casefold():
+            BOOKS.pop(i)
+            return {'message': 'Libro eliminado correctamente'}
+
