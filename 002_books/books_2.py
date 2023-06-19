@@ -22,9 +22,9 @@ class Book:
 
 
 class BookRequest(BaseModel):
-    id: int
+    id: Optional[int]
     title: str = Field(min_length=3)
-    author: str = Field(min_length=1)
+    author: str = Field(min_length=10)
     description: str = Field(min_length=1, max_length=100)
     rating: int = Field(gt=0, lt=6)
 
