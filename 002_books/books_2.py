@@ -83,6 +83,14 @@ async def update_book(update_book: BookRequest):
             return {'message': 'libro actualizado correctamente'}
 
 
+@app.delete("/book/delete/{book_id}")
+async def delete_book(book_id: int):
+    for x in range(len(BOOKS)):
+        if BOOKS[x].id == book_id:
+            BOOKS.pop(x)
+            return {'message': 'libro eliminado correctamente'}
+
+
 @app.post("/book/create_pydantic")
 async def create_book(book_request: BookRequest):
     new_book = Book(**book_request.dict())
