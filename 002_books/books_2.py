@@ -41,9 +41,9 @@ class BookRequest(BaseModel):
 BOOKS = [
     Book(id=1, title="Computer Science Pro", author="ponsianodeloor", description="A Very important Book", rating=5),
     Book(2, 'Postgres with Python', 'ponsianodeloor', 'A Database book', 5),
-    Book(3, 'Master in Endpoints', 'ponsianodeloor', 'A Endpoint book', 5),
-    Book(4, 'HP1', 'Author one', 'Book description', 5),
-    Book(5, 'HP2', 'Author two', 'Book description', 5),
+    Book(3, 'Master in Endpoints', 'ponsianodeloor', 'A Endpoint book', 4),
+    Book(4, 'HP1', 'Author one', 'Book description', 3),
+    Book(5, 'HP2', 'Author two', 'Book description', 3),
     Book(6, 'HP3', 'Author three', 'Book description', 5),
 ]
 
@@ -52,11 +52,22 @@ BOOKS = [
 async def books():
     return BOOKS
 
+
 @app.get("/book/{book_id}")
 async def book(book_id: int):
     for x in BOOKS:
         if x.id == book_id:
             return x
+
+
+@app.get("/books_by_rating")
+async def books_by_rating(rating: int):
+    books_filtered = []
+    for x in BOOKS:
+        if x.rating == rating:
+            books_filtered.append(x)
+    return books_filtered
+
 
 @app.post("/book/create")
 async def create_book(book_request=Body()):
@@ -71,6 +82,6 @@ async def create_book(book_request: BookRequest):
 
 
 def find_book_id(book: Book):
-    #cuando a una lista se le indica -1 es por que se refiere al último
+    # A una lista se le indica -1 es por que se refiere al último
     book.id = 1 if len(BOOKS) == 0 else BOOKS[-1].id + 1
     return book
