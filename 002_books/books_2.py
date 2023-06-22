@@ -75,6 +75,14 @@ async def create_book(book_request=Body()):
     {'message': 'Libro agregado correctamente'}
 
 
+@app.put("/book/update/")
+async def update_book(update_book: BookRequest):
+    for x in range(len(BOOKS)):
+        if BOOKS[x].id == update_book.id:
+            BOOKS[x] = update_book
+            return {'message': 'libro actualizado correctamente'}
+
+
 @app.post("/book/create_pydantic")
 async def create_book(book_request: BookRequest):
     new_book = Book(**book_request.dict())
