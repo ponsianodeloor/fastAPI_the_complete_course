@@ -12,13 +12,15 @@ class Book:
     author = str
     description = str
     rating = int
+    published_date = int
 
-    def __init__(self, id, title, author, description, rating):
+    def __init__(self, id, title, author, description, rating, published_date):
         self.id = id
         self.title = title
         self.author = author
         self.description = description
         self.rating = rating
+        self.published_date = published_date
 
 
 class BookRequest(BaseModel):
@@ -27,6 +29,7 @@ class BookRequest(BaseModel):
     author: str = Field(min_length=10)
     description: str = Field(min_length=1, max_length=100)
     rating: int = Field(gt=0, lt=6)
+    published_date: int = Field(gt=4, lt=4)
 
     class Config:
         schema_extra = {
@@ -34,17 +37,18 @@ class BookRequest(BaseModel):
                 'title': 'The new morning dev',
                 'autor': 'ponsianodeloor',
                 'description': 'Una descripcion del libro',
-                'rating': 5
+                'rating': 5,
+                'published_date': 2020
             }
         }
 
 BOOKS = [
-    Book(id=1, title="Computer Science Pro", author="ponsianodeloor", description="A Very important Book", rating=5),
-    Book(2, 'Postgres with Python', 'ponsianodeloor', 'A Database book', 5),
-    Book(3, 'Master in Endpoints', 'ponsianodeloor', 'A Endpoint book', 4),
-    Book(4, 'HP1', 'Author one', 'Book description', 3),
-    Book(5, 'HP2', 'Author two', 'Book description', 3),
-    Book(6, 'HP3', 'Author three', 'Book description', 5),
+    Book(id=1, title="Computer Science Pro", author="ponsianodeloor", description="A Very important Book", rating=5, published_date=2021),
+    Book(2, 'Postgres with Python', 'ponsianodeloor', 'A Database book', 5, 2022),
+    Book(3, 'Master in Endpoints', 'ponsianodeloor', 'A Endpoint book', 4, 2022),
+    Book(4, 'HP1', 'Author one', 'Book description', 3, 2021),
+    Book(5, 'HP2', 'Author two', 'Book description', 3, 2023),
+    Book(6, 'HP3', 'Author three', 'Book description', 5, 2024),
 ]
 
 
@@ -65,6 +69,14 @@ async def books_by_rating(rating: int):
     books_filtered = []
     for x in BOOKS:
         if x.rating == rating:
+            books_filtered.append(x)
+    return books_filtered
+
+@app.get("/books_by_year")
+async def books_by_year(year: int):
+    books_filtered = []
+    for x in BOOKS:
+        if x.published_date == year:
             books_filtered.append(x)
     return books_filtered
 
