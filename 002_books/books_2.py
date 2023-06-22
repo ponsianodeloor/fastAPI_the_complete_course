@@ -22,12 +22,21 @@ class Book:
 
 
 class BookRequest(BaseModel):
-    id: Optional[int]
+    id: Optional[int] = Field(title="Este parametro no es requerido")
     title: str = Field(min_length=3)
     author: str = Field(min_length=10)
     description: str = Field(min_length=1, max_length=100)
     rating: int = Field(gt=0, lt=6)
 
+    class Config:
+        schema_extra = {
+            'example': {
+                'title': 'The new morning dev',
+                'autor': 'ponsianodeloor',
+                'description': 'Una descripcion del libro',
+                'rating': 5
+            }
+        }
 
 BOOKS = [
     Book(id=1, title="Computer Science Pro", author="ponsianodeloor", description="A Very important Book", rating=5),
