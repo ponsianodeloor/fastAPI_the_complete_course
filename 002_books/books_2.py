@@ -57,5 +57,6 @@ async def create_book(book_request: BookRequest):
 
 
 def find_book_id(book: Book):
+    #cuando a una lista se le indica -1 es por que se refiere al último
     book.id = 1 if len(BOOKS) == 0 else BOOKS[-1].id + 1
     return book
