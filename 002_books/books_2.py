@@ -1,5 +1,5 @@
 from typing import Optional
-from fastapi import FastAPI, Body
+from fastapi import FastAPI, Body, Path
 from pydantic import BaseModel, Field
 
 
@@ -58,7 +58,7 @@ async def books():
 
 
 @app.get("/book/{book_id}")
-async def book(book_id: int):
+async def book(book_id: int = Path(gt=0)):
     for x in BOOKS:
         if x.id == book_id:
             return x
@@ -96,7 +96,7 @@ async def update_book(update_book: BookRequest):
 
 
 @app.delete("/book/delete/{book_id}")
-async def delete_book(book_id: int):
+async def delete_book(book_id: int = Path(gt=0)):
     for x in range(len(BOOKS)):
         if BOOKS[x].id == book_id:
             BOOKS.pop(x)
