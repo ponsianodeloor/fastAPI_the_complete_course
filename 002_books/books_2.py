@@ -1,5 +1,5 @@
 from typing import Optional
-from fastapi import FastAPI, Body, Path, Query
+from fastapi import FastAPI, Body, Path, Query, HTTPException
 from pydantic import BaseModel, Field
 
 
@@ -62,6 +62,7 @@ async def book(book_id: int = Path(gt=0)):
     for x in BOOKS:
         if x.id == book_id:
             return x
+    raise HTTPException(status_code=400, detail='Libro no encontrado')
 
 
 @app.get("/books_by_rating")
@@ -89,18 +90,30 @@ async def create_book(book_request=Body()):
 
 @app.put("/book/update/")
 async def update_book(update_book: BookRequest):
+    book_change = False
     for x in range(len(BOOKS)):
         if BOOKS[x].id == update_book.id:
             BOOKS[x] = update_book
-            return {'message': 'libro actualizado correctamente'}
+            book_change = True
+            break
+    if book_change:
+        raise HTTPException(status_code=200, detail='Libro eliminado correctamente')
+    else:
+        raise HTTPException(status_code=404, detail='Libro no encontrado')
 
 
 @app.delete("/book/delete/{book_id}")
 async def delete_book(book_id: int = Path(gt=0)):
+    book_change = False
     for x in range(len(BOOKS)):
         if BOOKS[x].id == book_id:
             BOOKS.pop(x)
-            return {'message': 'libro eliminado correctamente'}
+            book_change = True
+            break
+    if book_change:
+        raise HTTPException(status_code=200, detail='Libro eliminado correctamente')
+    else:
+        raise HTTPException(status_code=404, detail='Libro no encontrado')
 
 
 @app.post("/book/create_pydantic")
