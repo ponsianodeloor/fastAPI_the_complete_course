@@ -1,7 +1,7 @@
 from typing import Optional
 from fastapi import FastAPI, Body, Path, Query, HTTPException
 from pydantic import BaseModel, Field
-from starlette import status
+
 
 app = FastAPI()
 
@@ -52,12 +52,12 @@ BOOKS = [
 ]
 
 
-@app.get("/books", status_code=status.HTTP_200_OK)
+@app.get("/books")
 async def books():
     return BOOKS
 
 
-@app.get("/book/{book_id}", status_code=status.HTTP_200_OK)
+@app.get("/book/{book_id}")
 async def book(book_id: int = Path(gt=0)):
     for x in BOOKS:
         if x.id == book_id:
@@ -65,7 +65,7 @@ async def book(book_id: int = Path(gt=0)):
     raise HTTPException(status_code=400, detail='Libro no encontrado')
 
 
-@app.get("/books_by_rating", status_code=status.HTTP_200_OK)
+@app.get("/books_by_rating")
 async def books_by_rating(rating: int = Query(gt=0, lt=6)):
     books_filtered = []
     for x in BOOKS:
@@ -73,7 +73,7 @@ async def books_by_rating(rating: int = Query(gt=0, lt=6)):
             books_filtered.append(x)
     return books_filtered
 
-@app.get("/books_by_year", status_code=status.HTTP_200_OK)
+@app.get("/books_by_year")
 async def books_by_year(year: int = Query(gt=1999, lt=2023)):
     books_filtered = []
     for x in BOOKS:
@@ -82,13 +82,13 @@ async def books_by_year(year: int = Query(gt=1999, lt=2023)):
     return books_filtered
 
 
-@app.post("/book/create", status_code=status.HTTP_201_CREATED)
+@app.post("/book/create")
 async def create_book(book_request=Body()):
     BOOKS.append(book_request)
     {'message': 'Libro agregado correctamente'}
 
 
-@app.put("/book/update/", status_code=status.HTTP_204_NO_CONTENT)
+@app.put("/book/update/")
 async def update_book(update_book: BookRequest):
     book_change = False
     for x in range(len(BOOKS)):
@@ -97,12 +97,12 @@ async def update_book(update_book: BookRequest):
             book_change = True
             break
     if book_change:
-        raise HTTPException(status_code=204, detail='Libro actualizado correctamente')
+        raise HTTPException(status_code=200, detail='Libro eliminado correctamente')
     else:
         raise HTTPException(status_code=404, detail='Libro no encontrado')
 
 
-@app.delete("/book/delete/{book_id}", status_code=status.HTTP_204_NO_CONTENT)
+@app.delete("/book/delete/{book_id}")
 async def delete_book(book_id: int = Path(gt=0)):
     book_change = False
     for x in range(len(BOOKS)):
@@ -111,7 +111,7 @@ async def delete_book(book_id: int = Path(gt=0)):
             book_change = True
             break
     if book_change:
-        raise HTTPException(status_code=204, detail='Libro eliminado correctamente')
+        raise HTTPException(status_code=200, detail='Libro eliminado correctamente')
     else:
         raise HTTPException(status_code=404, detail='Libro no encontrado')
 
