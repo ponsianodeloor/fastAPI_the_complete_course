@@ -6,7 +6,7 @@ from fastapi import FastAPI, Depends, HTTPException, Path
 from starlette import status
 
 import models
-from models import Todos
+from models import Todos, TodosRequest
 from database import engine, SessionLocal
 
 app = FastAPI()
@@ -41,5 +41,13 @@ async def read_id(db: db_dependency, id: int = Path(gt=0)):
     if todo is not None:
         return todo
     raise HTTPException(status_code=404, detail='Todo no encontrado')
+
+
+@app.post("/todo", status_code=status.HTTP_201_CREATED)
+async def create_todo(db: db_dependency, todos_request: TodosRequest):
+    todo_model = Todos(**todos_request.dict())
+
+    db.add(todo_model)
+    db.commit()
 
 
