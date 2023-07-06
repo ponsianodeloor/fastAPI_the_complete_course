@@ -43,6 +43,7 @@ class BookRequest(BaseModel):
             }
         }
 
+
 BOOKS = [
     Book(id=1, title="Computer Science Pro", author="ponsianodeloor", description="A Very important Book", rating=5, published_date=2021),
     Book(2, 'Postgres with Python', 'ponsianodeloor', 'A Database book', 5, 2022),
@@ -73,6 +74,7 @@ async def books_by_rating(rating: int = Query(gt=0, lt=6)):
         if x.rating == rating:
             books_filtered.append(x)
     return books_filtered
+
 
 @app.get("/books_by_year", status_code=status.HTTP_200_OK)
 async def books_by_year(year: int = Query(gt=1999, lt=2023)):
