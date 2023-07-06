@@ -51,3 +51,21 @@ async def create_todo(db: db_dependency, todos_request: TodosRequest):
     db.commit()
 
 
+@app.put("/todo/{id}", status_code=status.HTTP_204_NO_CONTENT)
+async def update_todo(
+        db: db_dependency,
+        todos_request: TodosRequest,
+        id: int = Path(gt=0)
+):
+    todo_model = db.query(Todos).filter(Todos.id == id).first()
+
+    if todo_model is None:
+        raise HTTPException(status_code=404, detail='Todo no encontrado')
+
+    todo_model.title = todos_request.title
+    todo_model.description = todos_request.description
+    todo_model.priority = todos_request.priority
+    todos_request.complete = todos_request.complete
+
+    db.add(todo_model)
+    db.commit()
