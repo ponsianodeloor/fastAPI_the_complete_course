@@ -14,6 +14,8 @@ from routers import auth
 app = FastAPI()
 
 models.Base.metadata.create_all(bind=engine)
+
+# incluir rutas desde otros archivos
 app.include_router(auth.router)
 
 
