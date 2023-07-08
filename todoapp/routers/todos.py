@@ -1,22 +1,13 @@
 from typing import Annotated
 from sqlalchemy.orm import Session
-
 from fastapi.responses import RedirectResponse
-from fastapi import FastAPI, Depends, HTTPException, Path
+from fastapi import APIRouter, Depends, HTTPException, Path
 from starlette import status
-
-import models
 from models import Todos, TodosRequest
-from database import engine, SessionLocal
+from database import SessionLocal
 
-from routers import auth
 
-app = FastAPI()
-
-models.Base.metadata.create_all(bind=engine)
-
-# incluir rutas desde otros archivos
-app.include_router(auth.router)
+router = APIRouter()
 
 
 def get_db():
@@ -30,17 +21,17 @@ def get_db():
 db_dependency = Annotated[Session, Depends(get_db)]
 
 
-@app.get("/")
+@router.get("/")
 def go_to_docs():
     return RedirectResponse("/docs")
 
 
-@app.get("/read_all", status_code=status.HTTP_200_OK)
+@router.get("/read_all", status_code=status.HTTP_200_OK)
 async def read_all(db: db_dependency):
     return db.query(Todos).all()
 
 
-@app.get("/todo/{id}", status_code=status.HTTP_200_OK)
+@router.get("/todo/{id}", status_code=status.HTTP_200_OK)
 async def read_id(db: db_dependency, id: int = Path(gt=0)):
     todo = db.query(Todos).filter(Todos.id == id).first()
     if todo is not None:
@@ -48,7 +39,7 @@ async def read_id(db: db_dependency, id: int = Path(gt=0)):
     raise HTTPException(status_code=404, detail='Todo no encontrado')
 
 
-@app.post("/todo", status_code=status.HTTP_201_CREATED)
+@router.post("/todo", status_code=status.HTTP_201_CREATED)
 async def create_todo(db: db_dependency, todos_request: TodosRequest):
     todo_model = Todos(**todos_request.dict())
 
@@ -56,7 +47,7 @@ async def create_todo(db: db_dependency, todos_request: TodosRequest):
     db.commit()
 
 
-@app.put("/todo/{id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.put("/todo/{id}", status_code=status.HTTP_204_NO_CONTENT)
 async def update_todo(
         db: db_dependency,
         todos_request: TodosRequest,
@@ -76,7 +67,7 @@ async def update_todo(
     db.commit()
 
 
-@app.delete("/todo/{id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/todo/{id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_todo(db: db_dependency, id: int = Path(gt=0)):
     todo_model = db.query(Todos).filter(Todos.id == id).first()
 
