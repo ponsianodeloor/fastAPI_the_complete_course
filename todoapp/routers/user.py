@@ -7,6 +7,8 @@ from database import get_db
 from models import User
 from passlib.context import CryptContext
 
+from fastapi.security import OAuth2PasswordRequestForm
+
 router = APIRouter()
 
 bcrypt_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
@@ -36,3 +38,24 @@ async def create_user(db: db_dependency, create_user_request: UserSchema):
     db.commit()
 
 
+def auth_user(username: str, password: str, db):
+    get_user = db.query(User).filter(User.username == username).first()
+    if not get_user:
+        return False
+
+    if not bcrypt_context.verify(password, get_user.hashed_password):
+        return False
+
+    return True
+
+
+@router.post("/token")
+async def login_for_access_token(
+        form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+        db: db_dependency
+):
+    login_user = auth_user(form_data.username, form_data.password, db)
+
+    if not login_user:
+        return 'Failed Authentication'
+    return form_data.username
