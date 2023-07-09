@@ -24,6 +24,7 @@ db_dependency = Annotated[Session, Depends(get_db)]
 
 UserSchema = user.UserSchema
 
+
 @router.get("/users")
 async def get_users(db: db_dependency):
     return db.query(User).all()

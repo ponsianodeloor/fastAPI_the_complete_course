@@ -7,7 +7,6 @@ from schemas import todo
 from models import Todo
 from database import SessionLocal
 
-
 router = APIRouter()
 
 
