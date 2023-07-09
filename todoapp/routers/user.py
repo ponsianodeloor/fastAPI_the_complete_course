@@ -3,22 +3,13 @@ from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends
 from starlette import status
 from schemas import user
-from database import SessionLocal
+from database import get_db
 from models import User
 from passlib.context import CryptContext
 
 router = APIRouter()
 
 bcrypt_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
-
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
 
 db_dependency = Annotated[Session, Depends(get_db)]
 

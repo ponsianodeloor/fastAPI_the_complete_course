@@ -5,17 +5,9 @@ from fastapi import APIRouter, Depends, HTTPException, Path
 from starlette import status
 from schemas import todo
 from models import Todo
-from database import SessionLocal
+from database import get_db
 
 router = APIRouter()
-
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 
 db_dependency = Annotated[Session, Depends(get_db)]
