@@ -1,21 +1,27 @@
+from datetime import timedelta, datetime
 from typing import Annotated
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends
 from starlette import status
-from schemas import user
+from schemas import user, token
 from database import get_db
 from models import User
 from passlib.context import CryptContext
 
 from fastapi.security import OAuth2PasswordRequestForm
+from jose import jwt
 
 router = APIRouter()
+
+SECRET_KEY = '197b2c37c391bed93fe80344fe73b806947a65e36206e05a1a23c2fa12702fe3'
+ALGORITHM = 'HS256'
 
 bcrypt_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 
 db_dependency = Annotated[Session, Depends(get_db)]
 
 UserSchema = user.UserSchema
+TokenSchema = token.TokenSchema
 
 
 @router.get("/users")
@@ -46,10 +52,24 @@ def auth_user(username: str, password: str, db):
     if not bcrypt_context.verify(password, get_user.hashed_password):
         return False
 
-    return True
+    return get_user
 
 
-@router.post("/token")
+def create_access_token(username: str, user_id: int, expires_delta: timedelta):
+    encode = {
+        'sub': username, 'id': user_id
+    }
+
+    expires = datetime.utcnow() + expires_delta
+
+    encode.update({
+        'exp': expires
+    })
+
+    return jwt.encode(encode, SECRET_KEY, algorithm=ALGORITHM)
+
+
+@router.post("/token", response_model=TokenSchema)
 async def login_for_access_token(
         form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
         db: db_dependency
@@ -58,4 +78,10 @@ async def login_for_access_token(
 
     if not login_user:
         return 'Failed Authentication'
-    return form_data.username
+
+    get_token = create_access_token(login_user.username, login_user.id, timedelta(minutes=20))
+
+    return {
+        'access_token': get_token,
+        'token_type': 'bearer'
+    }
