@@ -1,6 +1,5 @@
 from typing import Annotated
 from sqlalchemy.orm import Session
-from fastapi.responses import RedirectResponse
 from fastapi import APIRouter, Depends, HTTPException, Path
 from starlette import status
 from schemas import todo
@@ -16,11 +15,6 @@ router = APIRouter(
 db_dependency = Annotated[Session, Depends(get_db)]
 
 TodoSchema = todo.TodoSchema
-
-
-@router.get("/")
-def go_to_docs():
-    return RedirectResponse("/docs")
 
 
 @router.get("/read_all", status_code=status.HTTP_200_OK)

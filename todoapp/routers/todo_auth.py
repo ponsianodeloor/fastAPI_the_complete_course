@@ -1,11 +1,11 @@
 from typing import Annotated
 from sqlalchemy.orm import Session
-from fastapi.responses import RedirectResponse
 from fastapi import APIRouter, Depends, HTTPException, Path
 from starlette import status
 from schemas import todo_auth
 from models import Todo
 from database import get_db
+from routers.user import get_user_by_token
 
 router = APIRouter(
     prefix='/todo_auth',
@@ -14,13 +14,9 @@ router = APIRouter(
 
 
 db_dependency = Annotated[Session, Depends(get_db)]
+user_dependency = Annotated[dict, Depends(get_user_by_token)]
 
 TodoAuthSchema = todo_auth.TodoAuthSchema
-
-
-@router.get("/")
-def go_to_docs():
-    return RedirectResponse("/docs")
 
 
 @router.get("/read_all", status_code=status.HTTP_200_OK)
@@ -37,8 +33,15 @@ async def read_id(db: db_dependency, id: int = Path(gt=0)):
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-async def create_todo(db: db_dependency, todos_schema: TodoAuthSchema):
-    todo_create = Todo(**todos_schema.dict())
+async def create_todo(
+        user: user_dependency,
+        db: db_dependency,
+        todos_schema: TodoAuthSchema
+):
+    if user is None:
+        raise HTTPException(status_code=401, detail='Authentication Failed')
+
+    todo_create = Todo(**todos_schema.dict(), user_id=user.get('id'))
 
     db.add(todo_create)
     db.commit()
