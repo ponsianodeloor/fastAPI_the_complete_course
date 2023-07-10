@@ -7,7 +7,10 @@ from schemas import todo
 from models import Todo
 from database import get_db
 
-router = APIRouter()
+router = APIRouter(
+    prefix='/todo',
+    tags=['todo']
+)
 
 
 db_dependency = Annotated[Session, Depends(get_db)]
@@ -25,7 +28,7 @@ async def read_all(db: db_dependency):
     return db.query(Todo).all()
 
 
-@router.get("/todo/{id}", status_code=status.HTTP_200_OK)
+@router.get("/{id}", status_code=status.HTTP_200_OK)
 async def read_id(db: db_dependency, id: int = Path(gt=0)):
     todo_by_id = db.query(Todo).filter(Todo.id == id).first()
     if todo_by_id is not None:
@@ -33,7 +36,7 @@ async def read_id(db: db_dependency, id: int = Path(gt=0)):
     raise HTTPException(status_code=404, detail='Todo no encontrado')
 
 
-@router.post("/todo", status_code=status.HTTP_201_CREATED)
+@router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_todo(db: db_dependency, todos_schema: TodoSchema):
     todo_create = Todo(**todos_schema.dict())
 
@@ -41,7 +44,7 @@ async def create_todo(db: db_dependency, todos_schema: TodoSchema):
     db.commit()
 
 
-@router.put("/todo/{id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.put("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 async def update_todo(
         db: db_dependency,
         todos_request: TodoSchema,
@@ -61,7 +64,7 @@ async def update_todo(
     db.commit()
 
 
-@router.delete("/todo/{id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_todo(db: db_dependency, id: int = Path(gt=0)):
     todo_delete = db.query(Todo).filter(Todo.id == id).first()
 

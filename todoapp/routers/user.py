@@ -11,13 +11,16 @@ from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from jose import jwt, JWTError
 
-router = APIRouter()
+router = APIRouter(
+    prefix='/user',
+    tags=['user']
+)
 
 SECRET_KEY = '197b2c37c391bed93fe80344fe73b806947a65e36206e05a1a23c2fa12702fe3'
 ALGORITHM = 'HS256'
 
 bcrypt_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
-oauth2_bearer = OAuth2PasswordBearer(tokenUrl='token')
+oauth2_bearer = OAuth2PasswordBearer(tokenUrl='user/token')
 
 db_dependency = Annotated[Session, Depends(get_db)]
 
@@ -25,12 +28,12 @@ UserSchema = user.UserSchema
 TokenSchema = token.TokenSchema
 
 
-@router.get("/users")
+@router.get("/")
 async def get_users(db: db_dependency):
     return db.query(User).all()
 
 
-@router.post("/users/create", status_code=status.HTTP_201_CREATED)
+@router.post("/create", status_code=status.HTTP_201_CREATED)
 async def create_user(db: db_dependency, create_user_request: UserSchema):
     create_user_model = User(
         email=create_user_request.email,
