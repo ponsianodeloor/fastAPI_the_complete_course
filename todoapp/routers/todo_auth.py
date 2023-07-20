@@ -75,11 +75,17 @@ async def create_todo(
 
 @router.put("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 async def update_todo(
+        user: user_dependency,
         db: db_dependency,
         todos_request: TodoAuthSchema,
         id: int = Path(gt=0)
 ):
-    todo_update = db.query(Todo).filter(Todo.id == id).first()
+    if user is None:
+        raise HTTPException(status_code=401, detail='Authentication Failed')
+
+    todo_update = db.query(Todo)\
+        .filter(Todo.id == id)\
+        .filter(Todo.user_id == user.get('id')).first()
 
     if todo_update is None:
         raise HTTPException(status_code=404, detail='Todo no encontrado')
@@ -94,8 +100,17 @@ async def update_todo(
 
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_todo(db: db_dependency, id: int = Path(gt=0)):
-    todo_delete = db.query(Todo).filter(Todo.id == id).first()
+async def delete_todo(
+        user: user_dependency,
+        db: db_dependency,
+        id: int = Path(gt=0)
+):
+    if user is None:
+        raise HTTPException(status_code=401, detail='Authentication Failed')
+
+    todo_delete = db.query(Todo)\
+        .filter(Todo.id == id)\
+        .filter(Todo.user_id == user.get('id')).first()
 
     if todo_delete is None:
         raise HTTPException(status_code=404, detail='ID no encontrado')
