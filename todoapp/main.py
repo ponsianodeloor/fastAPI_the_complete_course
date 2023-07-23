@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 import models
 from database import engine
-from routers import user, todo, todo_auth
+from routers import user, todo, todo_auth, admin
 from fastapi.responses import RedirectResponse
 
 
@@ -18,4 +18,5 @@ def redirect():
 app.include_router(user.router)
 app.include_router(todo.router)
 app.include_router(todo_auth.router)
+app.include_router(admin.router)
 
